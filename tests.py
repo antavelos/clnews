@@ -72,5 +72,43 @@ class TestConsole(unittest.TestCase):
         keys = channels.keys()
         self.assertEqual(data, [(ch, channels[ch]["name"]) for ch in keys])
 
+    def test_get_channel_events(self):
+        channel_name = 'cnn'
+        channel_url = 'http://rss.cnn.com/rss/edition_world.rss'
+        ch = Channel(channel_name, channel_url)
+
+        events = ch.get_events()
+        get_events = self.console._get(channel_name, channel_url)
+        self.assertEqual(len(events), len(get_events))
+
+    def test_analyse_input(self):
+        # command does not exist
+        
+        self.assertRaises(ConsoleCommandDoesNotExist, 
+                          self.console._analyse_input, 'false_command')
+
+        # test .help command
+        self.assertEqual(self.console._analyse_input('.help'), 
+                         self.console._help())
+
+        # test .list command
+        self.assertEqual(self.console._analyse_input('.list'), 
+                         self.console._list())
+
+        # test .get with few options
+        self.assertRaises(ConsoleCommandChannelNotFound, 
+                          self.console._analyse_input, '.get')
+
+        # test .get with not available channel
+        self.assertRaises(ConsoleCommandChannelNotFound, 
+                          self.console._analyse_input, '.get false_channel')
+
+        channel_name = 'cnn'
+        channel_url = 'http://rss.cnn.com/rss/edition_world.rss'
+        events = self.console._get(channel_name, channel_url)
+        get_events = self.console._analyse_input('.get cnn')
+        self.assertEqual(len(events), len(get_events))
+
+
 if __name__ == '__main__':
     unittest.main()

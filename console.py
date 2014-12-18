@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import re
 import json
 
@@ -48,9 +50,9 @@ class Console(object):
         Print the help message
         '''
 
-        str = "CLI News (%s) \n" % self.config['version']
-        str += "Options:"
-        for com in commands:
+        str = "CLI News (%s) \n\n" % self.config['version']
+        str += "Options:\n"
+        for com in self.commands:
             str += "\t%10s\t%s\n" %(com[0], com[1])
         str += "\n"
 
@@ -65,12 +67,19 @@ class Console(object):
 
         return [(ch, channels[ch]["name"]) for ch in keys]
 
-    def _get(self, channel):
+    def _print_channels_list(self, channels_list):
+        '''
+        Print the list of available channels
+        '''
+        for ch, name in channels_list:
+            print "%10s   %s" % (ch, name)
+        
+        
+    def _get(self, channel_name, channel_url):
         '''
         Retrieve the events for the given channel
         '''
-
-        ch = channel(channel['name'], channel['url'])
+        ch = Channel(channel_name, channel_url)
 
         return ch.get_events()
 
@@ -82,26 +91,27 @@ class Console(object):
         tokens = input.split()
         first = tokens[0]
 
-        if first not in self.commands:
+        if first not in [ com for com, desc in self.commands]:
             raise ConsoleCommandDoesNotExist
 
         if first == '.help':
             return self._help()
 
         if first == '.list':
-            channels_list = self._list()
-            for ch, name in channels_list:
-                print "%10s   %s" % (ch, name)
+            return  self._list()            
 
         if first == '.get':
             if len(tokens) < 2:
                 raise ConsoleCommandChannelNotFound
 
-            channels = [ch.keys[0] for ch, url in self.config['channels']]
+            channels = self.config['channels'].keys()
             if tokens[1] not in channels:
                 raise ConsoleCommandChannelNotFound
 
-            return self._get(tokens[1])
+            channel = self.config['channels'][tokens[1]]
+            
+            return self._get(channel['name'],
+                             channel['url'])
 
 
     def run(self):
@@ -117,3 +127,6 @@ class Console(object):
                 print str(e), 'Press .help to see the available options'
 
 
+if __name__ == '__main__':
+    c = Console()
+    c.run()
