@@ -3,7 +3,6 @@
 import re
 import json
 
-import config
 from news import *
 from exception import *
 
@@ -19,9 +18,11 @@ class Console(object):
         try:
             self.config = self._load_config('config.json')
         except ConsoleConfigFileDoesNotExist, e:
-            print str(e) + "\nExiting..."
+            print "The config.json file was not found.\nExiting..."
+            exit()
         except ConsoleConfigFileFormatError, e:
-            print str(e) + "\nExiting..."
+            print "The config.json file is not properly formatted.\nExiting..."
+            exit()
 
     def _load_config(self, filename):
         '''
@@ -50,7 +51,7 @@ class Console(object):
         Print the help message
         '''
 
-        str = "CLI News (%s) \n\n" % self.config['version']
+        str = "CLI News %s \n\n" % self.config['version']
         str += "Options:\n"
         for com in self.commands:
             str += "\t%10s\t%s\n" %(com[0], com[1])
@@ -109,7 +110,7 @@ class Console(object):
                 raise ConsoleCommandChannelNotFound
 
             channel = self.config['channels'][tokens[1]]
-            
+
             return self._get(channel['name'],
                              channel['url'])
 
@@ -118,13 +119,17 @@ class Console(object):
         '''
         Infinite loop for the command line
         '''
+        print "CLI News %s \n" % self.config['version']
         while True:
             input = self._prompt("news>")
             try:
                 output = self._analyse_input(input)
                 print output
             except ConsoleCommandDoesNotExist, e:
-                print str(e), 'Press .help to see the available options'
+                print str(e), 'Use .help to see the available options'
+            except ConsoleCommandChannelNotFound:
+                print ('The channel was not found. ' 
+                       'Use .list to see the available ones.')
 
 
 if __name__ == '__main__':
