@@ -24,6 +24,11 @@ class TestNews(unittest.TestCase):
         self.assertEqual(str(self.event), "%s, %s" % (self.event.title, 
                          self.event.url))
 
+    def test_remove_html(self):
+        html = '<div class"class">test test test<img src="src"/></div>'
+        output = self.event._remove_html(html)
+        self.assertEqual(output, 'test test test')
+
     # test Channel
     def test__get_data(self):
         data = self.channel._get_data()

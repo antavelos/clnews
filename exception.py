@@ -11,6 +11,9 @@ class ChannelDataNotFound(Exception):
 class ChannelServerError(Exception):
 	pass
 
+class ChannelRetrieveEventsError(Exception):
+	pass
+
 
 # Console
 class ConsoleCommandDoesNotExist(Exception):

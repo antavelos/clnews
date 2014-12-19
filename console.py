@@ -2,6 +2,8 @@
 import re
 import json
 
+from colorama import init as colorama_init, Fore, Back, Style
+
 from news import *
 from exception import *
 import config
@@ -58,11 +60,13 @@ class CommandList(Command):
         '''
         List all the available channels
         '''
-        self.buffer = [(ch, config.CHANNELS[ch]["name"]) for ch in config.CHANNELS.keys()]
+        self.buffer = [(ch, config.CHANNELS[ch]["name"]) 
+                       for ch 
+                       in config.CHANNELS.keys()]
 
     def print_output(self):
-        for short, name in self.buffer:
-            print "%10s,  %s" % (short, name)
+        for i, (short, name) in enumerate(self.buffer):
+            print "%3d. %10s [%s]" % (i, name, short)
 
 
 class CommandGet(Command):
@@ -79,19 +83,30 @@ class CommandGet(Command):
         '''
         ch = Channel(self.channel_name, self.channel_url)
 
-        self.buffer = ch.get_events()
+        try:
+            self.buffer = ch.get_events()
+        except ChannelRetrieveEventsError:
+            self.buffer = 'There was an error while retrieving the events.'
 
     def print_output(self):
-        for event in self.buffer:
-            print event.title, event.date
-            print event.url
-            print event.summary
-
+        if isinstance(self.buffer, list):
+            for i, event in enumerate(self.buffer):
+                print "%3s. %s, %s\n     %s\n     %s\n" % \
+                    (Fore.WHITE + Style.BRIGHT + str(i + 1), 
+                     event.title, 
+                     Fore.MAGENTA + event.date, 
+                     Fore.WHITE + Style.DIM + event.url, 
+                     Fore.YELLOW + Style.NORMAL + event.summary)
+            
+            print(Fore.RESET + Back.RESET + Style.RESET_ALL)
+        else:
+            print self.buffer
     
 class Console(object):
 
     def __init__(self):
         self.command = None
+        colorama_init()
 
     def _prompt(self, text):
         return raw_input(text)
@@ -100,6 +115,8 @@ class Console(object):
         '''
         Analyse the user input per command
         '''
+        if 'quit' == input:
+            raise EOFError
 
         tokens = input.split()
         first = tokens[0]
@@ -132,9 +149,12 @@ class Console(object):
         print "CLI News %s \n" % config.VERSION
         command = Command('name', 'description')
         while True:
-            input = self._prompt("news>")
             try:
+                input = self._prompt("news> ")
                 command = self._analyse_input(input)
+            except EOFError:
+                print 
+                exit()
             except ConsoleCommandDoesNotExist, e:
                 print str(e), 'Use .help to see the available options'
             except ConsoleCommandChannelNotFound:

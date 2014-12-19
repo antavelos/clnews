@@ -13,5 +13,9 @@ CHANNELS = {
     "reuters": {
         "name": "REUTERS",
         "url": "http://feeds.reuters.com/news/artsculture"
+    },
+    "info-war": {
+        "name": "INFO WAR",
+        "url": "http://info-war.gr/feed/"
     }
 }

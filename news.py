@@ -1,3 +1,4 @@
+import re
 import datetime
 import feedparser
 
@@ -9,7 +10,13 @@ class Event(object):
 		self.title = title
 		self.url = url
 		self.date = date
-		self.summary = summary
+		self.summary = self._remove_html(summary)
+
+	def _remove_html(self, str):
+		p = re.compile(r'<.*?>')
+		str = p.sub('', str)
+		
+		return str
 
 	def __repr__(self):
 		return "%s, %s" % (self.title, self.url)
@@ -37,11 +44,11 @@ class Channel(object):
 		event_entries = self._get_data()
 		
 		try:
-			self.events = [Event(e.title, e.link, e.published) 
+			self.events = [Event(e.title, e.link, e.published, e.summary) 
 						   for e 
 						   in event_entries]
 		except TypeError:
-			raise ChannerRetrieveEventsError
+			raise ChannelRetrieveEventsError
 
 		return self.events
 
