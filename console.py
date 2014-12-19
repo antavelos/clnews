@@ -1,88 +1,100 @@
-#!/usr/bin/env python
 
 import re
 import json
 
 from news import *
 from exception import *
+import config
 
-class Console(object):
+COMMANDS = {
+    '.help': ('.help', 'show this help message and exit'),
+    '.list': ('.list', 'lists all the available channels'), 
+    '.get': ('.get', 'retrieves the news of a given channel, e.g.: .get cnn')
+}
+
+class Command(object):
+
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+        self.buffer = None
+
+    def execute(self):
+        pass
+
+    def print_output(self):
+        pass
+
+
+class CommandHelp(Command):
 
     def __init__(self):
-        self.commands = [
-            ('.help', 'show this help message and exit'), 
-            ('.list', 'lists all the available channels'), 
-            ('.get', 'retrieves the news of a given channel, e.g.: .get cnn')
-        ]
+        name, description = COMMANDS['.help']
+        super(CommandHelp, self).__init__(name, description)
 
-        try:
-            self.config = self._load_config('config.json')
-        except ConsoleConfigFileDoesNotExist, e:
-            print "The config.json file was not found.\nExiting..."
-            exit()
-        except ConsoleConfigFileFormatError, e:
-            print "The config.json file is not properly formatted.\nExiting..."
-            exit()
-
-    def _load_config(self, filename):
-        '''
-        Load the config file contains into a dictionary
-        '''
-
-        data = {}
-        try:
-            with open(filename, 'r') as f:
-                json_data = f.read()
-            f.close()
-            data = json.loads(json_data)
-        except IOError:
-            raise ConsoleConfigFileDoesNotExist
-        except ValueError, e:
-            raise ConsoleConfigFileFormatError
-
-        return data
-
-
-    def _prompt(self, text):
-        return raw_input(text)
-
-    def _help(self):
+    def execute(self):
         '''
         Print the help message
         '''
+        self.buffer = "CLI News %s \n\n" % config.VERSION
+        self.buffer += "Options:\n"
 
-        str = "CLI News %s \n\n" % self.config['version']
-        str += "Options:\n"
-        for com in self.commands:
-            str += "\t%10s\t%s\n" %(com[0], com[1])
-        str += "\n"
+        keys = COMMANDS.keys()
+        for key in keys:
+            self.buffer += "\t%10s\t%s\n" % (COMMANDS[key][0], COMMANDS[key][1])
+        self.buffer += "\n"
 
-        return str
+    def print_output(self):
+        print self.buffer
 
-    def _list(self):
+
+class CommandList(Command):
+
+    def __init__(self):
+        name, description = COMMANDS['.list']
+        super(CommandList, self).__init__(name, description)
+
+    def execute(self):
         '''
         List all the available channels
         '''
-        channels = self.config['channels']
-        keys = channels.keys()
+        self.buffer = [(ch, config.CHANNELS[ch]["name"]) for ch in config.CHANNELS.keys()]
 
-        return [(ch, channels[ch]["name"]) for ch in keys]
+    def print_output(self):
+        for short, name in self.buffer:
+            print "%10s,  %s" % (short, name)
 
-    def _print_channels_list(self, channels_list):
-        '''
-        Print the list of available channels
-        '''
-        for ch, name in channels_list:
-            print "%10s   %s" % (ch, name)
-        
-        
-    def _get(self, channel_name, channel_url):
+
+class CommandGet(Command):
+
+    def __init__(self, channel_name, channel_url):
+        name, description = COMMANDS['.get']
+        super(CommandGet, self).__init__(name, description)
+        self.channel_name = channel_name
+        self.channel_url = channel_url
+
+    def execute(self):
         '''
         Retrieve the events for the given channel
         '''
-        ch = Channel(channel_name, channel_url)
+        ch = Channel(self.channel_name, self.channel_url)
 
-        return ch.get_events()
+        self.buffer = ch.get_events()
+
+    def print_output(self):
+        for event in self.buffer:
+            print event.title, event.date
+            print event.url
+            print event.summary
+
+    
+class Console(object):
+
+    def __init__(self):
+        self.command = None
+
+    def _prompt(self, text):
+        return raw_input(text)
 
     def _analyse_input(self, input):
         '''
@@ -92,46 +104,42 @@ class Console(object):
         tokens = input.split()
         first = tokens[0]
 
-        if first not in [ com for com, desc in self.commands]:
+        if first not in COMMANDS.keys():
             raise ConsoleCommandDoesNotExist
 
         if first == '.help':
-            return self._help()
+            self.command = CommandHelp()
 
         if first == '.list':
-            return  self._list()            
+            self.command = CommandList()
 
         if first == '.get':
             if len(tokens) < 2:
                 raise ConsoleCommandChannelNotFound
-
-            channels = self.config['channels'].keys()
-            if tokens[1] not in channels:
+            
+            if tokens[1] not in config.CHANNELS.keys():
                 raise ConsoleCommandChannelNotFound
 
-            channel = self.config['channels'][tokens[1]]
+            channel = config.CHANNELS[tokens[1]]
+            self.command = CommandGet(channel['name'], channel['url'])
 
-            return self._get(channel['name'],
-                             channel['url'])
-
+        return self.command
 
     def run(self):
         '''
         Infinite loop for the command line
         '''
-        print "CLI News %s \n" % self.config['version']
+        print "CLI News %s \n" % config.VERSION
+        command = Command('name', 'description')
         while True:
             input = self._prompt("news>")
             try:
-                output = self._analyse_input(input)
-                print output
+                command = self._analyse_input(input)
             except ConsoleCommandDoesNotExist, e:
                 print str(e), 'Use .help to see the available options'
             except ConsoleCommandChannelNotFound:
                 print ('The channel was not found. ' 
                        'Use .list to see the available ones.')
 
-
-if __name__ == '__main__':
-    c = Console()
-    c.run()
+            command.execute()
+            command.print_output()

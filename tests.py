@@ -7,7 +7,7 @@ import os
 from news import * 
 from console import *
 from exception import *
-
+import config
 
 class TestNews(unittest.TestCase):
 
@@ -41,45 +41,36 @@ class TestNews(unittest.TestCase):
                          events[0].url))
 
 
+class TestCommand(unittest.TestCase):
+    def setUp(self):
+        self.command = Command('name', 'desc')
+
+    def test_command_list(self):
+        command = CommandList()
+        command.execute()
+        self.assertTrue(isinstance(command.buffer, list))
+        self.assertTrue(isinstance(command.buffer[0], tuple))
+
+        channels = config.CHANNELS
+        keys = channels.keys()
+        self.assertEqual(command.buffer, 
+                         [(ch, channels[ch]["name"]) for ch in keys])
+        
+    def test_test_command_get(self):
+        channel_name = 'cnn'
+        channel_url = 'http://rss.cnn.com/rss/edition_world.rss'
+        ch = Channel(channel_name, channel_url)
+        command = CommandGet(channel_name, channel_url)
+        
+        events = ch.get_events()
+        command.execute()
+        self.assertEqual(len(events), len(command.buffer))
+
+
 class TestConsole(unittest.TestCase):
 
     def setUp(self):
         self.console = Console()
-
-    def test_config_file(self):
-        # file does not exist
-        self.assertRaises(ConsoleConfigFileDoesNotExist, 
-                          self.console._load_config, 'not_existent')
-        
-        # bad json format
-        with open('temp.json', 'w') as f:
-            f.write('{"name":"value"')
-            f.close()
-
-        self.assertRaises(ConsoleConfigFileFormatError, 
-                          self.console._load_config, 'temp.json')
-        os.remove('temp.json')
-        
-        data = self.console._load_config('config.json')
-        self.assertTrue(isinstance(data, dict))
-
-    def test_list_channels(self):
-        data = self.console._list()
-        self.assertTrue(isinstance(data, list))
-        self.assertTrue(isinstance(data[0], tuple))
-
-        channels = self.console.config["channels"]
-        keys = channels.keys()
-        self.assertEqual(data, [(ch, channels[ch]["name"]) for ch in keys])
-
-    def test_get_channel_events(self):
-        channel_name = 'cnn'
-        channel_url = 'http://rss.cnn.com/rss/edition_world.rss'
-        ch = Channel(channel_name, channel_url)
-
-        events = ch.get_events()
-        get_events = self.console._get(channel_name, channel_url)
-        self.assertEqual(len(events), len(get_events))
 
     def test_analyse_input(self):
         # command does not exist
@@ -88,12 +79,12 @@ class TestConsole(unittest.TestCase):
                           self.console._analyse_input, 'false_command')
 
         # test .help command
-        self.assertEqual(self.console._analyse_input('.help'), 
-                         self.console._help())
+        output = self.console._analyse_input('.help')
+        self.assertTrue(isinstance(output, CommandHelp))
 
         # test .list command
-        self.assertEqual(self.console._analyse_input('.list'), 
-                         self.console._list())
+        output = self.console._analyse_input('.list')
+        self.assertTrue(isinstance(output, CommandList))
 
         # test .get with few options
         self.assertRaises(ConsoleCommandChannelNotFound, 
@@ -103,11 +94,6 @@ class TestConsole(unittest.TestCase):
         self.assertRaises(ConsoleCommandChannelNotFound, 
                           self.console._analyse_input, '.get false_channel')
 
-        channel_name = 'cnn'
-        channel_url = 'http://rss.cnn.com/rss/edition_world.rss'
-        events = self.console._get(channel_name, channel_url)
-        get_events = self.console._analyse_input('.get cnn')
-        self.assertEqual(len(events), len(get_events))
 
 
 if __name__ == '__main__':
