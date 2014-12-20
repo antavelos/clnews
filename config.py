@@ -11,11 +11,15 @@ CHANNELS = {
         "url": "http://feeds.bbci.co.uk/news/rss.xml"
     },
     "reuters": {
-        "name": "REUTERS",
+        "name": "Reuters",
         "url": "http://feeds.reuters.com/news/artsculture"
     },
     "info-war": {
-        "name": "INFO WAR",
+        "name": "Info War",
         "url": "http://info-war.gr/feed/"
+    },
+    "world-news": {
+        "name": "World News",
+        "url": "http://news.feedzilla.com/en_us/headlines/top-news/world-news.rss"
     }
 }

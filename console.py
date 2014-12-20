@@ -66,7 +66,7 @@ class CommandList(Command):
 
     def print_output(self):
         for i, (short, name) in enumerate(self.buffer):
-            print "%3d. %10s [%s]" % (i, name, short)
+            print "%3d. %10s [%s]" % (i + 1, name, short)
 
 
 class CommandGet(Command):
@@ -151,7 +151,8 @@ class Console(object):
         while True:
             try:
                 input = self._prompt("news> ")
-                command = self._analyse_input(input)
+                if input:
+                    command = self._analyse_input(input)
             except EOFError:
                 print 
                 exit()
