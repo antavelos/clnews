@@ -7,7 +7,7 @@ A command line rss news feed reader.
 ### Version
 0.1.0
 
-### Install
+### Installation
 ``` pip install clnews```
 
 ### Configuration

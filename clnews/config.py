@@ -21,5 +21,9 @@ CHANNELS = {
     "world-news": {
         "name": "World News",
         "url": "http://news.feedzilla.com/en_us/headlines/top-news/world-news.rss"
+    },
+    "nbc": {
+        "name": "NBC - Top strories",
+        "url": "http://feeds.nbcnews.com/feeds/topstories"
     }
 }
