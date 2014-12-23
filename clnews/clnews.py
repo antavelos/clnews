@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from console import Console
+from shell import Shell
 
 if __name__ == '__main__':
-    c = Console()
+    c = Shell()
     c.run()

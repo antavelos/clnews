@@ -1,6 +1,7 @@
 
 import re
 import json
+import sys
 
 from colorama import init as colorama_init, Fore, Back, Style
 
@@ -102,7 +103,7 @@ class CommandGet(Command):
         else:
             print self.buffer
     
-class Console(object):
+class Shell(object):
 
     def __init__(self):
         self.command = None
@@ -122,7 +123,7 @@ class Console(object):
         first = tokens[0]
 
         if first not in COMMANDS.keys():
-            raise ConsoleCommandDoesNotExist
+            raise ShellCommandDoesNotExist
 
         if first == '.help':
             self.command = CommandHelp()
@@ -132,10 +133,10 @@ class Console(object):
 
         if first == '.get':
             if len(tokens) < 2:
-                raise ConsoleCommandChannelNotFound
+                raise ShellCommandChannelNotFound
             
             if tokens[1] not in config.CHANNELS.keys():
-                raise ConsoleCommandChannelNotFound
+                raise ShellCommandChannelNotFound
 
             channel = config.CHANNELS[tokens[1]]
             self.command = CommandGet(channel['name'], channel['url'])
@@ -155,10 +156,10 @@ class Console(object):
                     command = self._analyse_input(input)
             except EOFError:
                 print 
-                exit()
-            except ConsoleCommandDoesNotExist, e:
+                break    
+            except ShellCommandDoesNotExist, e:
                 print str(e), 'Use .help to see the available options'
-            except ConsoleCommandChannelNotFound:
+            except ShellCommandChannelNotFound:
                 print ('The channel was not found. ' 
                        'Use .list to see the available ones.')
 

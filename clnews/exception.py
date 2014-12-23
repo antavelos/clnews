@@ -15,9 +15,9 @@ class ChannelRetrieveEventsError(Exception):
 	pass
 
 
-# Console
-class ConsoleCommandDoesNotExist(Exception):
+# Shell
+class ShellCommandDoesNotExist(Exception):
 	pass
 	
-class ConsoleCommandChannelNotFound(Exception):
+class ShellCommandChannelNotFound(Exception):
 	pass
