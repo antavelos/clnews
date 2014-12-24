@@ -15,7 +15,7 @@ class ChannelRetrieveEventsError(Exception):
 	pass
 
 
-# Shell
+# Shell Exceptions
 class ShellCommandDoesNotExist(Exception):
 	pass
 	
