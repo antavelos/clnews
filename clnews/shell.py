@@ -137,12 +137,13 @@ class CommandList(Command):
             list.
         """
         try:
-            output =  "%s| Name %s| Code\n" % (5 * " ", 15 * " ")
-            output += "%s+%s+%s\n" % (5 * "-", 21 * "-", 20 * "-")
-            for i, (short, name) in enumerate(self.buffer):
-                output += "%5s|%20s | %s\n" % (str(i + 1), name, short)
+            output = ["%s| Name %s| Code" % (5 * " ", 15 * " "),
+                      "%s+%s+%s" % (5 * "-", 21 * "-", 20 * "-")]
+            output += ["%5s|%20s | %s" % (str(i + 1), name, short)
+                       for i, (short, name) 
+                       in enumerate(self.buffer)]
 
-            return output
+            return "\n".join(output)
         except TypeError:
             # the buffer is not a list as expected
             raise ShellCommandOutputError
@@ -192,16 +193,16 @@ class CommandGet(Command):
             list.
         """
         try:
-            output = ""
-            for i, event in enumerate(self.buffer):
-                output += "%3s. %s, %s\n     %s\n     %s\n\n" % \
-                    (Fore.WHITE + Style.BRIGHT + str(i + 1), 
-                     event.title, 
-                     Fore.MAGENTA + event.date, 
-                     Fore.WHITE + Style.DIM + event.url, 
-                     Fore.YELLOW + Style.NORMAL + event.summary)
+            output = ["%3s. %s, %s\n     %s\n     %s\n" % \
+                      (Fore.WHITE + Style.BRIGHT + str(i + 1), event.title, 
+                      Fore.MAGENTA + event.date, 
+                      Fore.WHITE + Style.DIM + event.url, 
+                      Fore.YELLOW + Style.NORMAL + event.summary)
+                      for i, event 
+                      in enumerate(self.buffer)]
             
-            return output
+            return "\n".join(output)
+
         except TypeError:
             # the buffer is not a list as expected
             raise ShellCommandOutputError
@@ -250,7 +251,7 @@ class Shell(object):
     def run(self):
         """ Runs infinitely executing the commands given in input."""
 
-        print "CLI News %s \n" % config.VERSION
+        print "CLNews %s \n" % config.VERSION
         command = Command('name', 'description')
         while True:
             try:
