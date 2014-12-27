@@ -22,6 +22,11 @@ news
 .. automodule:: clnews.news
     :members:
 
+exceptions
+=========================
+.. automodule:: clnews.exception
+    :members:
+
 Indices and tables
 ==================
 

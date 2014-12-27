@@ -3,9 +3,11 @@
 import unittest
 import datetime
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '../'))
 
 from news import * 
-from console import *
+from shell import *
 from exception import *
 import config
 
@@ -72,34 +74,33 @@ class TestCommand(unittest.TestCase):
         self.assertEqual(len(events), len(command.buffer))
 
 
-class TestConsole(unittest.TestCase):
+class TestShell(unittest.TestCase):
 
     def setUp(self):
-        self.console = Console()
+        self.shell = Shell()
 
     def test_analyse_input(self):
         # command does not exist
         
-        self.assertRaises(ConsoleCommandDoesNotExist, 
-                          self.console._analyse_input, 'false_command')
+        self.assertRaises(ShellCommandDoesNotExist, 
+                          self.shell._analyse_input, 'false_command')
 
         # test .help command
-        output = self.console._analyse_input('.help')
+        output = self.shell._analyse_input('.help')
         self.assertTrue(isinstance(output, CommandHelp))
 
         # test .list command
-        output = self.console._analyse_input('.list')
+        output = self.shell._analyse_input('.list')
         self.assertTrue(isinstance(output, CommandList))
 
         # test .get with few options
-        self.assertRaises(ConsoleCommandChannelNotFound, 
-                          self.console._analyse_input, '.get')
+        self.assertRaises(ShellCommandChannelNotFound, 
+                          self.shell._analyse_input, '.get')
 
         # test .get with not available channel
-        self.assertRaises(ConsoleCommandChannelNotFound, 
-                          self.console._analyse_input, '.get false_channel')
-
-
+        self.assertRaises(ShellCommandChannelNotFound, 
+                          self.shell._analyse_input, '.get false_channel')
+        
 
 if __name__ == '__main__':
     unittest.main()
