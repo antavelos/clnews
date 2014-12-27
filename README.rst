@@ -5,14 +5,14 @@ Command Line News
 
 Version
 =======
-	``0.2.0``
+	``0.2.1``
 
 
 Installation
 ============
-1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.1.0.tar.gz>
+1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.2.1.tar.gz>
 2. Extract the contents of the file:
-        ``tar -xvfz clnews-0.1.0.tar.gz``
+        ``tar -xvfz clnews-0.2.1.tar.gz``
 
 
 Configuration

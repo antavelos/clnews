@@ -127,7 +127,8 @@ class CommandList(Command):
         self.buffer = [(ch, config.CHANNELS[ch]["name"]) 
                        for ch 
                        in config.CHANNELS.keys()]
-
+    
+    @less
     def print_output(self):
         """ Prints the output of the command
         
@@ -136,8 +137,12 @@ class CommandList(Command):
             list.
         """
         try:
+            output =  "%s| Name %s| Code\n" % (5 * " ", 15 * " ")
+            output += "%s+%s+%s\n" % (5 * "-", 21 * "-", 20 * "-")
             for i, (short, name) in enumerate(self.buffer):
-                print "%3d. %10s [%s]" % (i + 1, name, short)
+                output += "%5s|%20s | %s\n" % (str(i + 1), name, short)
+
+            return output
         except TypeError:
             # the buffer is not a list as expected
             raise ShellCommandOutputError
