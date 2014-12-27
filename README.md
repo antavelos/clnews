@@ -8,7 +8,10 @@ A command line rss news feed reader.
 0.1.0
 
 ### Installation
+1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.1.0.tar.gz>
 
+2. Extract the contents of the file:
+    ```tar -xvfz clnews-0.1.0.tar.gz```
 
 ### Configuration
 All you need to do is to add your RSS urls into the ```config.py``` under the ```CHANNELS``` dictionary as following:
@@ -20,14 +23,25 @@ All you need to do is to add your RSS urls into the ```config.py``` under the ``
 }
 ```
 ### Usage
+Run the script:
 ```python clnews.py```
 
 ##### Options
-```.help```: show the help message and exit
+When the scripts starts running a command prompt will appear:
 
-```.list```: lists all the available channels
+`news>`
 
-```.get```: retrieves the news of a given channel, e.g.: .get cnn
+The available commands that you can use are the following:
+
+`news> .help`
+displays the help message and exit
+
+`news> .list`
+lists all the available channels
+
+`news> .get`
+retrieves the news of a given channel, e.g.: .get cnn
+
 
 ### License
 MIT
