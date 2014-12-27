@@ -1,8 +1,9 @@
 from setuptools import setup
 
+from clnews.config import VERSION
 setup(
     name='clnews',
-    version='0.1.0',
+    version=VERSION,
     author='Alexandros Ntavelos',
     author_email='a.ntavelos@gmail.com',
     packages=['clnews', 'clnews.test'],

@@ -5,7 +5,7 @@ Command Line News
 A command line rss news feed reader.
 
 ### Version
-0.1.0
+0.2.0
 
 ### Installation
 1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.1.0.tar.gz>

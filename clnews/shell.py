@@ -9,19 +9,50 @@
 import re
 import json
 import sys
+from subprocess import Popen, PIPE
+import errno
+import codecs
 
 from colorama import init as colorama_init, Fore, Back, Style
 
 from news import *
 from exception import ChannelRetrieveEventsError, ShellCommandDoesNotExist, \
-ShellCommandChannelNotFound, ShellCommandOutputError
+ShellCommandChannelNotFound, ShellCommandExecutionError, ShellCommandOutputError
 import config
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 COMMANDS = {
     '.help': ('.help', 'show this help message and exit'),
     '.list': ('.list', 'lists all the available channels'), 
     '.get': ('.get', 'retrieves the news of a given channel, e.g.: .get cnn')
 }
+
+
+def less(func):
+    """Less decorator.
+
+    Pipes the output of the decorated function into the less commans
+    
+    """
+    def inner(self):
+        p = Popen(['less', '-R'], stdin=PIPE)
+        line = func(self)
+        try:
+            p.stdin.write(line)
+        except IOError as e:
+            if e.errno == errno.EPIPE or e.errno == errno.EINVAL:
+                # Stop loop on "Invalid pipe" or "Invalid argument".
+                # No sense in continuing with broken pipe.
+                return
+            else:
+                # Raise any other error.
+                raise
+
+        p.stdin.close()
+        p.wait()
+    return inner
 
 
 class Command(object):
@@ -146,7 +177,8 @@ class CommandGet(Command):
             self.buffer = ch.get_events()
         except ChannelRetrieveEventsError:
             raise ShellCommandOutputError
-
+    
+    @less
     def print_output(self):
         """ Prints the output of the command
         
@@ -154,16 +186,17 @@ class CommandGet(Command):
             ShellCommandOutputError: An error occured when the buffer is not a 
             list.
         """
-        try:        
+        try:
+            output = ""
             for i, event in enumerate(self.buffer):
-                print "%3s. %s, %s\n     %s\n     %s\n" % \
+                output += "%3s. %s, %s\n     %s\n     %s\n\n" % \
                     (Fore.WHITE + Style.BRIGHT + str(i + 1), 
                      event.title, 
                      Fore.MAGENTA + event.date, 
                      Fore.WHITE + Style.DIM + event.url, 
                      Fore.YELLOW + Style.NORMAL + event.summary)
             
-            print(Fore.RESET + Back.RESET + Style.RESET_ALL)
+            return output
         except TypeError:
             # the buffer is not a list as expected
             raise ShellCommandOutputError
