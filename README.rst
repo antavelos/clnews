@@ -10,39 +10,42 @@ Version
 
 Installation
 ============
-	
+1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.1.0.tar.gz>
+2. Extract the contents of the file:
+        ``tar -xvfz clnews-0.1.0.tar.gz``
 
 
 Configuration
 =============
-	All you need to do is to add your RSS urls into the ``config.py`` under the ``CHANNELS`` dictionary as following
-
+All you need to do is to add your RSS urls into the ``config.py`` under the ``CHANNELS`` dictionary as following::
 
 	"nbc": {
 	    "name": "NBC",
-
 	    "url": "http://feeds.nbcnews.com/feeds/topstories"
-
 	}
 
 
 
 Usage
 =====
-
-``clnews.py``
+Run the script:
+    ``python clnews.py``
 
 
 Options
 =======
+When the scripts starts running a command prompt will appear: 
+    ``news>``
 
-* ``.help`` 
-	show the help message and exit
+The available commands that you can use are the following:
 
-* ``.list`` 
+* ``news> .help`` 
+	displays the help message and exit
+
+* ``news> .list`` 
 	lists all the available channels
 
-* ``.get`` 
+* ``news> .get`` 
 	retrieves the news of a given channel, e.g.: .get cnn
 
 License
