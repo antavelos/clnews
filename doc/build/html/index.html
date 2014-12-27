@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to CLNews’s documentation! &mdash; CLNews 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="CLNews 0.1.0 documentation" href="#" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">CLNews 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-clnews-s-documentation">
+<h1>Welcome to CLNews&#8217;s documentation!<a class="headerlink" href="#welcome-to-clnews-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+</div>
+<div class="section" id="module-clnews.shell">
+<span id="shell"></span><h1>shell<a class="headerlink" href="#module-clnews.shell" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="clnews.shell.Command">
+<em class="property">class </em><code class="descclassname">clnews.shell.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>name</em>, <em>description</em><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract class implementing the shell commands.</p>
+<p>It implements the basic functionality of the shell commands and serves as a
+parent class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="clnews.shell.CommandGet">
+<em class="property">class </em><code class="descclassname">clnews.shell.</code><code class="descname">CommandGet</code><span class="sig-paren">(</span><em>channel_name</em>, <em>channel_url</em><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandGet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the .get command.</p>
+<p>Derives from <code class="xref py py-class docutils literal"><span class="pre">shell.Command</span></code> class and implements the .get command</p>
+<dl class="method">
+<dt id="clnews.shell.CommandGet.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandGet.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the command.</p>
+<p>Retrieves the events for the given channel.</p>
+<dl class="docutils">
+<dt>Raises:</dt>
+<dd>ShellCommandExecutionError: An error occured when the event 
+retrieval fails.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="clnews.shell.CommandGet.print_output">
+<code class="descname">print_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandGet.print_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the output of the command</p>
+<dl class="docutils">
+<dt>Raises:</dt>
+<dd>ShellCommandOutputError: An error occured when the buffer is not a 
+list.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="clnews.shell.CommandHelp">
+<em class="property">class </em><code class="descclassname">clnews.shell.</code><code class="descname">CommandHelp</code><a class="headerlink" href="#clnews.shell.CommandHelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the .help command.</p>
+<p>Derives from <code class="xref py py-class docutils literal"><span class="pre">shell.Command</span></code> class and implements the .help command</p>
+<dl class="method">
+<dt id="clnews.shell.CommandHelp.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandHelp.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the command.</p>
+<p>Puts in the buffer the output of the command</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="clnews.shell.CommandHelp.print_output">
+<code class="descname">print_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandHelp.print_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the output of the command</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="clnews.shell.CommandList">
+<em class="property">class </em><code class="descclassname">clnews.shell.</code><code class="descname">CommandList</code><a class="headerlink" href="#clnews.shell.CommandList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the .list command.</p>
+<p>Derives from <code class="xref py py-class docutils literal"><span class="pre">shell.Command</span></code> class and implements the .list command</p>
+<dl class="method">
+<dt id="clnews.shell.CommandList.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandList.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the command.</p>
+<p>Lists all the available channels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="clnews.shell.CommandList.print_output">
+<code class="descname">print_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.CommandList.print_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the output of the command</p>
+<dl class="docutils">
+<dt>Raises:</dt>
+<dd>ShellCommandOutputError: An error occured when the buffer is not a 
+list.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="clnews.shell.Shell">
+<em class="property">class </em><code class="descclassname">clnews.shell.</code><code class="descname">Shell</code><a class="headerlink" href="#clnews.shell.Shell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the shell functionality.</p>
+<dl class="method">
+<dt id="clnews.shell.Shell.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.shell.Shell.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs infinitely executing the commands given in input.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-clnews.news">
+<span id="news"></span><h1>news<a class="headerlink" href="#module-clnews.news" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="clnews.news.Channel">
+<em class="property">class </em><code class="descclassname">clnews.news.</code><code class="descname">Channel</code><span class="sig-paren">(</span><em>name</em>, <em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#clnews.news.Channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the Channel functionality.</p>
+<dl class="method">
+<dt id="clnews.news.Channel.get_events">
+<code class="descname">get_events</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#clnews.news.Channel.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the current events.</p>
+<dl class="docutils">
+<dt>Raises:</dt>
+<dd>ChannelRetrieveEventsError: An error occured while retrieving the
+events.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="clnews.news.Event">
+<em class="property">class </em><code class="descclassname">clnews.news.</code><code class="descname">Event</code><span class="sig-paren">(</span><em>title</em>, <em>url</em>, <em>date</em>, <em>summary=''</em><span class="sig-paren">)</span><a class="headerlink" href="#clnews.news.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps up the data of an event.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to CLNews&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#module-clnews.shell">shell</a></li>
+<li><a class="reference internal" href="#module-clnews.news">news</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">CLNews 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2014, Alexandros Ntavelos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>
