@@ -4,10 +4,12 @@ import unittest
 import datetime
 import os
 import sys
+
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '../'))
 
 from news import * 
 from shell import *
+from data_structure import *
 from exception import *
 import config
 

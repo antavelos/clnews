@@ -12,10 +12,12 @@ import sys
 from subprocess import Popen, PIPE
 import errno
 import codecs
+import readline
 
 from colorama import init as colorama_init, Fore, Back, Style
 
-from news import *
+from news import Event, Channel
+from data_structure import Stack
 from exception import ChannelRetrieveEventsError, ShellCommandDoesNotExist, \
 ShellCommandChannelNotFound, ShellCommandExecutionError, ShellCommandOutputError
 import config
@@ -26,7 +28,8 @@ sys.setdefaultencoding("utf-8")
 COMMANDS = {
     '.help': ('.help', 'show this help message and exit'),
     '.list': ('.list', 'lists all the available channels'), 
-    '.get': ('.get', 'retrieves the news of a given channel, e.g.: .get cnn')
+    '.get': ('.get', 'retrieves the news of a given channel, e.g.: .get cnn'),
+    '.quit': ('.quit', 'exits the application.')
 }
 
 
@@ -96,7 +99,7 @@ class CommandHelp(Command):
         Puts in the buffer the output of the command
         """
 
-        self.buffer = "CLI News %s \n\n" % config.VERSION
+        self.buffer = "CLNews %s \n\n" % config.VERSION
         self.buffer += "Options:\n"
 
         for _, (name, description) in COMMANDS.iteritems():
@@ -214,14 +217,17 @@ class Shell(object):
     def __init__(self):
         """ Initializes the class."""
         self.command = None
+        
         colorama_init()
+        readline.parse_and_bind('tab: complete')
+        readline.parse_and_bind('set editing-mode vi')
 
     def _prompt(self, text):
+        sys.stdin.flush()
         return raw_input(text)
 
     def _analyse_input(self, input):
-        
-        if 'quit' == input:
+        if '.quit' == input:
             raise EOFError
 
         tokens = input.split()
@@ -245,7 +251,7 @@ class Shell(object):
 
             channel = config.CHANNELS[tokens[1]]
             self.command = CommandGet(channel['name'], channel['url'])
-
+        
         return self.command
 
     def run(self):
@@ -263,14 +269,19 @@ class Shell(object):
                 break    
             except ShellCommandDoesNotExist, e:
                 print str(e), 'Use .help to see the available options'
+                continue
             except ShellCommandChannelNotFound:
                 print ('The channel was not found. ' 
                        'Use .list to see the available ones.')
+                continue
+            
             try:
                 command.execute()
                 command.print_output()
             except ShellCommandExecutionError:
                 print "An error occured while executing the command."
+                continue
             except ShellCommandOutputError:
                 print "An error occured while printing the resultof the command"
+                continue
 

@@ -37,3 +37,7 @@ class ShellCommandExecutionError(Exception):
 
 class ShellCommandOutputError(Exception):
     """ Is raised when output is not of the expected type."""
+
+# Data structure exceptions
+class StackEmptyError(Exception):
+	""" Is raised when a stack is empty"""
