@@ -264,7 +264,7 @@ class Shell(object):
                 input = self._prompt("news> ")
                 if input:
                     command = self._analyse_input(input)
-            except EOFError:
+            except (EOFError, KeyboardInterrupt):
                 print 
                 break    
             except ShellCommandDoesNotExist, e:
