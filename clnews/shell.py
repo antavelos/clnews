@@ -127,9 +127,9 @@ class CommandList(Command):
 
         Lists all the available channels.
         '''
-        self.buffer = [(ch, config.CHANNELS[ch]["name"]) 
-                       for ch 
-                       in config.CHANNELS.keys()]
+        self.buffer = [(key, data["name"]) 
+                       for key, data 
+                       in config.CHANNELS.iteritems()]
     
     @less
     def print_output(self):
