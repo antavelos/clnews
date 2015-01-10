@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-CLNews 0.3.1 
+CLNews 0.4.0 
 =============
 
 Contents:

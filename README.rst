@@ -5,14 +5,12 @@ Command Line News
 
 Version
 =======
-	``0.3.1``
+	``0.4.0``
 
 
 Installation
 ============
-1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.2.1.tar.gz>
-2. Extract the contents of the file:
-        ``tar -xvfz clnews-0.2.1.tar.gz``
+        ``pip install clnews``
 
 
 Configuration
@@ -28,8 +26,7 @@ All you need to do is to add your RSS urls into the ``config.py`` under the ``CH
 
 Usage
 =====
-Run the script:
-    ``python clnews.py``
+    ``clnews``
 
 
 Options

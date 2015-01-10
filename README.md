@@ -5,13 +5,10 @@ Command Line News
 A command line rss news feed reader.
 
 ### Version
-0.3.1
+0.4.0
 
 ### Installation
-1. Download the package from <https://pypi.python.org/packages/source/c/clnews/clnews-0.3.1.tar.gz>
-
-2. Extract the contents of the file:
-    ```tar -xvfz clnews-0.3.1.tar.gz```
+    ```pip install clnews```
 
 ### Configuration
 All you need to do is to add your RSS urls into the ```config.py``` under the ```CHANNELS``` dictionary as following:
@@ -23,8 +20,7 @@ All you need to do is to add your RSS urls into the ```config.py``` under the ``
 }
 ```
 ### Usage
-Run the script:
-```python clnews.py```
+```clnews```
 
 ##### Options
 When the scripts starts running a command prompt will appear:

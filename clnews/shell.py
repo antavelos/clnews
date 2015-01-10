@@ -6,18 +6,13 @@
       .. moduleauthor:: Alexandros Ntavelos <a.ntavelos@gmail.com>
 
       """
-import re
-import json
 import sys
 from subprocess import Popen, PIPE
 import errno
-import codecs
-import readline
 
 from colorama import init as colorama_init, Fore, Back, Style
-
+import readline
 from news import Event, Channel
-from data_structure import Stack
 from exception import ChannelRetrieveEventsError, ShellCommandDoesNotExist, \
 ShellCommandChannelNotFound, ShellCommandExecutionError, ShellCommandOutputError
 import config
@@ -27,7 +22,7 @@ sys.setdefaultencoding("utf-8")
 
 COMMANDS = {
     '.help': ('.help', 'show this help message and exit'),
-    '.list': ('.list', 'lists all the available channels'), 
+    '.list': ('.list', 'lists all the available channels'),
     '.get': ('.get', 'retrieves the news of a given channel, e.g.: .get cnn'),
     '.quit': ('.quit', 'exits the application.')
 }
@@ -175,35 +170,35 @@ class CommandGet(Command):
         """ Executes the command.
 
         Retrieves the events for the given channel.
-        
+
         Raises:
-            ShellCommandExecutionError: An error occured when the event 
+            ShellCommandExecutionError: An error occured when the event
             retrieval fails.
         """
-        ch = Channel(self.channel_name, self.channel_url)
+        chan = Channel(self.channel_name, self.channel_url)
 
         try:
-            self.buffer = ch.get_events()
+            self.buffer = chan.get_events()
         except ChannelRetrieveEventsError:
             raise ShellCommandOutputError
-    
+
     @less
     def print_output(self):
         """ Prints the output of the command
-        
+
         Raises:
-            ShellCommandOutputError: An error occured when the buffer is not a 
+            ShellCommandOutputError: An error occured when the buffer is not a
             list.
         """
         try:
             output = ["%3s. %s, %s\n     %s\n     %s\n" % \
-                      (Fore.WHITE + Style.BRIGHT + str(i + 1), event.title, 
-                      Fore.MAGENTA + event.date, 
-                      Fore.WHITE + Style.DIM + event.url, 
+                      (Fore.WHITE + Style.BRIGHT + str(i + 1), event.title,
+                      Fore.MAGENTA + event.date,
+                      Fore.WHITE + Style.DIM + event.url,
                       Fore.YELLOW + Style.NORMAL + event.summary)
-                      for i, event 
+                      for i, event
                       in enumerate(self.buffer)]
-            
+
             return "\n".join(output)
 
         except TypeError:
@@ -217,7 +212,6 @@ class Shell(object):
     def __init__(self):
         """ Initializes the class."""
         self.command = None
-        
         colorama_init()
         readline.parse_and_bind('tab: complete')
         readline.parse_and_bind('set editing-mode vi')
@@ -226,11 +220,11 @@ class Shell(object):
         sys.stdin.flush()
         return raw_input(text)
 
-    def _analyse_input(self, input):
-        if '.quit' == input:
+    def _analyse_input(self, user_input):
+        if '.quit' == user_input:
             raise EOFError
 
-        tokens = input.split()
+        tokens = user_input.split()
         first = tokens[0]
 
         if first not in COMMANDS.keys():
@@ -245,13 +239,13 @@ class Shell(object):
         if first == '.get':
             if len(tokens) < 2:
                 raise ShellCommandChannelNotFound
-            
+
             if tokens[1] not in config.CHANNELS.keys():
                 raise ShellCommandChannelNotFound
 
             channel = config.CHANNELS[tokens[1]]
             self.command = CommandGet(channel['name'], channel['url'])
-        
+
         return self.command
 
     def run(self):
@@ -261,20 +255,20 @@ class Shell(object):
         command = Command('name', 'description')
         while True:
             try:
-                input = self._prompt("news> ")
-                if input:
-                    command = self._analyse_input(input)
+                user_input = self._prompt("news> ")
+                if user_input:
+                    command = self._analyse_input(user_input)
             except (EOFError, KeyboardInterrupt):
-                print 
-                break    
-            except ShellCommandDoesNotExist, e:
-                print str(e), 'Use .help to see the available options'
+                print
+                break
+            except ShellCommandDoesNotExist, exc:
+                print str(exc), 'Use .help to see the available options'
                 continue
             except ShellCommandChannelNotFound:
-                print ('The channel was not found. ' 
+                print('The channel was not found. '
                        'Use .list to see the available ones.')
                 continue
-            
+
             try:
                 command.execute()
                 command.print_output()
@@ -285,3 +279,6 @@ class Shell(object):
                 print "An error occured while printing the resultof the command"
                 continue
 
+def main():
+    shell = Shell()
+    shell.run()

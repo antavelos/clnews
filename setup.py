@@ -1,12 +1,23 @@
-from setuptools import setup
 
 from clnews.config import VERSION
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+    extra = {'scripts': ["bin/clnews"]}
+else:
+    extra = {
+        'entry_points': {
+            'console_scripts': ['clnews = clnews.shell:main'],
+         },
+    }
 setup(
     name='clnews',
     version=VERSION,
     author='Alexandros Ntavelos',
     author_email='a.ntavelos@gmail.com',
-    packages=['clnews', 'clnews.test'],
+    packages=['clnews', 'clnews.scripts', 'clnews.test'],
     # scripts=[],
     url='https://github.com/antavelos/clnews',
     license='LICENSE.txt',
@@ -17,4 +28,5 @@ setup(
         "feedparser==5.1.3",
         "termcolor==1.1.0",
     ],
+    **extra
 )
