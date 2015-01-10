@@ -8,7 +8,7 @@ A command line rss news feed reader.
 0.4.0
 
 ### Installation
-    ```pip install clnews```
+```pip install clnews```
 
 ### Configuration
 All you need to do is to add your RSS urls into the ```config.py``` under the ```CHANNELS``` dictionary as following:
@@ -19,8 +19,9 @@ All you need to do is to add your RSS urls into the ```config.py``` under the ``
     "url": "http://feeds.nbcnews.com/feeds/topstories"
 }
 ```
+
 ### Usage
-```clnews```
+Run ```clnews```
 
 ##### Options
 When the scripts starts running a command prompt will appear:
