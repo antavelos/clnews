@@ -7,6 +7,7 @@
 
       """
 import sys
+import pickle
 from subprocess import Popen, PIPE
 import errno
 
@@ -14,7 +15,8 @@ from colorama import init as colorama_init, Fore, Back, Style
 import readline
 from news import Event, Channel
 from exception import ChannelRetrieveEventsError, ShellCommandDoesNotExist, \
-ShellCommandChannelNotFound, ShellCommandExecutionError, ShellCommandOutputError
+ShellCommandChannelNotFound, ShellCommandExecutionError, \
+ShellCommandOutputError, ShellLoadDataIOError, ShellLoadDataCorruptedFile
 import config
 
 reload(sys)
@@ -32,15 +34,15 @@ def less(func):
     """Less decorator.
 
     Pipes the output of the decorated function into the less commans
-    
+
     """
     def inner(self):
-        p = Popen(['less', '-R'], stdin=PIPE)
+        pipe = Popen(['less', '-R'], stdin=PIPE)
         line = func(self)
         try:
-            p.stdin.write(line)
-        except IOError as e:
-            if e.errno == errno.EPIPE or e.errno == errno.EINVAL:
+            pipe.stdin.write(line)
+        except IOError as err:
+            if err.errno == errno.EPIPE or err.errno == errno.EINVAL:
                 # Stop loop on "Invalid pipe" or "Invalid argument".
                 # No sense in continuing with broken pipe.
                 return
@@ -48,8 +50,8 @@ def less(func):
                 # Raise any other error.
                 raise
 
-        p.stdin.close()
-        p.wait()
+        pipe.stdin.close()
+        pipe.wait()
     return inner
 
 
@@ -57,7 +59,7 @@ class Command(object):
     """ Abstract class implementing the shell commands.
 
     It implements the basic functionality of the shell commands and serves as a
-    parent class.    
+    parent class.
     """
     def __init__(self, name, description):
         """Initializes of the command.
@@ -70,18 +72,33 @@ class Command(object):
         self.description = description
         # saves the output of the command
         self.buffer = None
+        self.data = self._load_data()
+
+
+    def _load_data(self):
+        try:
+            self.data = pickle.load(open(config.CHANNELS_PATH, "rb"))
+        except IOError:
+            raise ShellLoadDataIOError
+        except KeyError:
+            raise ShellLoadDataCorruptedFile
+        else:
+            return self.data
+
 
     def execute(self):
-        pass
+        """ Parent function
+        """
 
     def print_output(self):
-        pass
+        """ Parent function
+        """
 
 
 class CommandHelp(Command):
-    """ Implements the .help command. 
-    
-    Derives from :class:`shell.Command` class and implements the .help command 
+    """ Implements the .help command.
+
+    Derives from :class:`shell.Command` class and implements the .help command
     """
     def __init__(self):
         """Initializes the class."""
@@ -90,7 +107,7 @@ class CommandHelp(Command):
 
     def execute(self):
         """ Executes the command.
-        
+
         Puts in the buffer the output of the command
         """
 
@@ -98,7 +115,7 @@ class CommandHelp(Command):
         self.buffer += "Options:\n"
 
         for _, (name, description) in COMMANDS.iteritems():
-            self.buffer += "\t%10s\t%s\n" % (name, description) 
+            self.buffer += "\t%10s\t%s\n" % (name, description)
         self.buffer += "\n"
 
     def print_output(self):
@@ -107,9 +124,9 @@ class CommandHelp(Command):
 
 
 class CommandList(Command):
-    """ Implements the .list command. 
-    
-    Derives from :class:`shell.Command` class and implements the .list command 
+    """ Implements the .list command.
+
+    Derives from :class:`shell.Command` class and implements the .list command
     """
 
     def __init__(self):
@@ -122,23 +139,23 @@ class CommandList(Command):
 
         Lists all the available channels.
         '''
-        self.buffer = [(key, data["name"]) 
-                       for key, data 
-                       in config.CHANNELS.iteritems()]
-    
+        self.buffer = [(key, data["name"])
+                       for key, data
+                       in self.data["channels"].iteritems()]
+
     @less
     def print_output(self):
         """ Prints the output of the command
-        
+
         Raises:
-            ShellCommandOutputError: An error occured when the buffer is not a 
+            ShellCommandOutputError: An error occured when the buffer is not a
             list.
         """
         try:
             output = ["%s| Name %s| Code" % (5 * " ", 15 * " "),
                       "%s+%s+%s" % (5 * "-", 21 * "-", 20 * "-")]
             output += ["%5s|%20s | %s" % (str(i + 1), name, short)
-                       for i, (short, name) 
+                       for i, (short, name)
                        in enumerate(self.buffer)]
 
             return "\n".join(output)
@@ -148,19 +165,19 @@ class CommandList(Command):
 
 
 class CommandGet(Command):
-    """ Implements the .get command. 
-    
-    Derives from :class:`shell.Command` class and implements the .get command 
+    """ Implements the .get command.
+
+    Derives from :class:`shell.Command` class and implements the .get command
     """
 
     def __init__(self, channel_name, channel_url):
         """ Initializes the class
-        
+
         Args:
             channel_name (str): The name of the channel
             channel_url (str): The URL of the channel feed
         """
-        
+
         name, description = COMMANDS['.get']
         super(CommandGet, self).__init__(name, description)
         self.channel_name = channel_name
@@ -192,12 +209,13 @@ class CommandGet(Command):
         """
         try:
             output = ["%3s. %s, %s\n     %s\n     %s\n" % \
-                      (Fore.WHITE + Style.BRIGHT + str(i + 1), event.title,
-                      Fore.MAGENTA + event.date,
-                      Fore.WHITE + Style.DIM + event.url,
-                      Fore.YELLOW + Style.NORMAL + event.summary)
-                      for i, event
-                      in enumerate(self.buffer)]
+                (Fore.WHITE + Style.BRIGHT + str(i + 1), event.title,
+                 Fore.MAGENTA + event.date,
+                 Fore.WHITE + Style.DIM + event.url,
+                 Fore.YELLOW + Style.NORMAL + event.summary)
+                 for i, event
+                 in enumerate(self.buffer)
+            ]
 
             return "\n".join(output)
 
@@ -280,5 +298,7 @@ class Shell(object):
                 continue
 
 def main():
+    """ Entry point
+    """
     shell = Shell()
     shell.run()
