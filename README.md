@@ -39,6 +39,8 @@ lists all the available channels
 `news> .get`:
 retrieves the news of a given channel, e.g.: .get cnn
 
+`news> .quit`:
+quits the application
 
 ### License
 MIT
