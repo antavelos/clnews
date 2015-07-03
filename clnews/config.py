@@ -7,6 +7,10 @@
 
       """
 
+import os
+
 VERSION = "0.4.0"
 
-CHANNELS_PATH = "data/channels.dat"
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+
+CHANNELS_PATH = os.path.join(PROJECT_PATH, "data/channels.dat")
