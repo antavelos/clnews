@@ -31,19 +31,22 @@ Usage
 
 Options
 =======
-When the scripts starts running a command prompt will appear: 
+When the scripts starts running a command prompt will appear:
     ``news>``
 
 The available commands that you can use are the following:
 
-* ``news> .help`` 
+* ``news> .help``
 	displays the help message and exit
 
-* ``news> .list`` 
+* ``news> .list``
 	lists all the available channels
 
-* ``news> .get`` 
+* ``news> .get``
 	retrieves the news of a given channel, e.g.: .get cnn
+
+* ``news> .quit``
+    quits the application
 
 License
 =======
