@@ -7,7 +7,7 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/' + '../'))
 
-from news import * 
+from news import *
 from shell import *
 from data_structure import *
 from exception import *
@@ -25,7 +25,7 @@ class TestNews(unittest.TestCase):
         # invalid date
         # event = Event('title', 'url', 'string date')
 
-        self.assertEqual(str(self.event), "%s, %s" % (self.event.title, 
+        self.assertEqual(str(self.event), "%s, %s" % (self.event.title,
                          self.event.url))
 
     def test_remove_html(self):
@@ -46,7 +46,7 @@ class TestNews(unittest.TestCase):
         events = self.channel.get_events()
         self.assertTrue(isinstance(events, list))
         self.assertTrue(isinstance(events[0], Event))
-        self.assertEqual(str(events[0]), "%s, %s" % (events[0].title, 
+        self.assertEqual(str(events[0]), "%s, %s" % (events[0].title,
                          events[0].url))
 
 
@@ -62,15 +62,15 @@ class TestCommand(unittest.TestCase):
 
         channels = config.CHANNELS
         keys = channels.keys()
-        self.assertEqual(command.buffer, 
+        self.assertEqual(command.buffer,
                          [(ch, channels[ch]["name"]) for ch in keys])
-        
+
     def test_test_command_get(self):
         channel_name = 'cnn'
         channel_url = 'http://rss.cnn.com/rss/edition_world.rss'
         ch = Channel(channel_name, channel_url)
         command = CommandGet(channel_name, channel_url)
-        
+
         events = ch.get_events()
         command.execute()
         self.assertEqual(len(events), len(command.buffer))
@@ -83,8 +83,8 @@ class TestShell(unittest.TestCase):
 
     def test_analyse_input(self):
         # command does not exist
-        
-        self.assertRaises(ShellCommandDoesNotExist, 
+
+        self.assertRaises(CommandDoesNotExist,
                           self.shell._analyse_input, 'false_command')
 
         # test .help command
@@ -96,13 +96,13 @@ class TestShell(unittest.TestCase):
         self.assertTrue(isinstance(output, CommandList))
 
         # test .get with few options
-        self.assertRaises(ShellCommandChannelNotFound, 
+        self.assertRaises(CommandChannelNotFound,
                           self.shell._analyse_input, '.get')
 
         # test .get with not available channel
-        self.assertRaises(ShellCommandChannelNotFound, 
+        self.assertRaises(CommandChannelNotFound,
                           self.shell._analyse_input, '.get false_channel')
-        
+
 
 if __name__ == '__main__':
     unittest.main()

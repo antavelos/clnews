@@ -32,17 +32,18 @@ class ShellLoadDataIOError(Exception):
 class ShellLoadDataCorruptedFile(Exception):
     """ Is raised when the data file is corrupted"""
 
-class ShellCommandDoesNotExist(Exception):
+class CommandDoesNotExist(Exception):
     """ Is raised when an unknown command is given in input prompt."""
 
-class ShellCommandChannelNotFound(Exception):
+class CommandChannelNotFound(Exception):
     """ Is raised when events from an unknown channel are requested."""
 
-class ShellCommandExecutionError(Exception):
+class CommandExecutionError(Exception):
     """ IS raised when an error occurs while executing a command."""
 
-class ShellCommandOutputError(Exception):
+class CommandOutputError(Exception):
     """ Is raised when output is not of the expected type."""
+
 
 # Data structure exceptions
 class StackEmptyError(Exception):

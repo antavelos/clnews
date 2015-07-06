@@ -7,16 +7,16 @@
 
       """
 
-import pickle
-
 from colorama import Fore, Style
 
 from clnews import config
 from clnews.news import Channel
 from clnews.decorators import less
-from clnews.exception import ShellLoadDataIOError, ShellLoadDataCorruptedFile, \
-ShellCommandOutputError, ChannelRetrieveEventsError, ShellCommandDoesNotExist, \
-ShellCommandChannelNotFound
+from clnews.utils import DataFile, validate_url
+from clnews.exception import  CommandOutputError, ChannelRetrieveEventsError, \
+CommandDoesNotExist, CommandChannelNotFound, CommandExecutionError
+
+
 
 
 class Command(object):
@@ -34,19 +34,9 @@ class Command(object):
 
         # saves the output of the command
         self.buffer = None
-        if self.data is None:
-            self.data = self._load_data()
-
-    def _load_data(self):
-        try:
-            self.data = pickle.load(open(config.CHANNELS_PATH, "rb"))
-        except IOError:
-            raise ShellLoadDataIOError
-        except KeyError:
-            raise ShellLoadDataCorruptedFile
-        else:
-            return self.data
-
+        self.data_file = DataFile(config.CHANNELS_PATH)
+        if not Command.data:
+            Command.data = self.data_file.load()
 
     @classmethod
     def get_commands_data(cls):
@@ -60,9 +50,8 @@ class Command(object):
         raise NotImplementedError
 
     def print_output(self):
-        """ Parent function
-        """
-        raise NotImplementedError
+        """ Prints the output of the command"""
+        print self.buffer
 
 
 class Help(Command):
@@ -87,10 +76,6 @@ class Help(Command):
             self.buffer += "\t%10s\t%s\n" % (name, description)
         self.buffer += "\n"
 
-    def print_output(self):
-        """ Prints the output of the command"""
-        print self.buffer
-
 
 class List(Command):
     """ Implements the .list command.
@@ -106,16 +91,18 @@ class List(Command):
 
         Lists all the available channels.
         '''
-        self.buffer = [(key, data["name"])
-                       for key, data
-                       in self.data["channels"].iteritems()]
+        self.buffer = ''
+        if self.data:
+            self.buffer = [(key, data["name"])
+                           for key, data
+                           in self.data["channels"].iteritems()]
 
     @less
     def print_output(self):
         """ Prints the output of the command
 
         Raises:
-            ShellCommandOutputError: An error occured when the buffer is not a
+            CommandOutputError: An error occured when the buffer is not a
             list.
         """
         try:
@@ -128,7 +115,7 @@ class List(Command):
             return "\n".join(output)
         except TypeError:
             # the buffer is not a list as expected
-            raise ShellCommandOutputError
+            raise CommandOutputError
 
 
 class Get(Command):
@@ -146,15 +133,18 @@ class Get(Command):
         Retrieves the events for the given channel.
 
         Raises:
-            ShellCommandExecutionError: An error occured when the event
+            CommandExecutionError: An error occured when the event
             retrieval fails.
         """
+        if not self.data:
+            raise CommandExecutionError("You channels' list is empty.")
+
         if len(args) > 1:
-            raise ShellCommandDoesNotExist
+            raise CommandDoesNotExist
 
         channel_code = args[0]
         if channel_code not in self.data['channels'].keys():
-            raise ShellCommandChannelNotFound
+            raise CommandChannelNotFound
 
         name = self.data['channels'][channel_code]['name']
         url = self.data['channels'][channel_code]['url']
@@ -164,14 +154,14 @@ class Get(Command):
         try:
             self.buffer = channel.get_events()
         except ChannelRetrieveEventsError:
-            raise ShellCommandOutputError
+            raise CommandOutputError
 
     @less
     def print_output(self):
         """ Prints the output of the command
 
         Raises:
-            ShellCommandOutputError: An error occured when the buffer is not a
+            CommandOutputError: An error occured when the buffer is not a
             list.
         """
         try:
@@ -188,7 +178,7 @@ class Get(Command):
 
         except TypeError:
             # the buffer is not a list as expected
-            raise ShellCommandOutputError
+            raise CommandOutputError
 
 
 class Quit(Command):
@@ -201,9 +191,40 @@ class Quit(Command):
     description = "exits the application."
 
 
-def get_command_by_input(input):
-    name = input[0]
-    arguments = input[1:]
+
+class Add(Command):
+    """ Implements the .add command.
+
+    Derives from :class:`shell.Command` class and implements the .get command
+    """
+
+    name = ".add"
+    description = "adds a new channel."
+
+
+    def execute(self, *args):
+        try:
+            code, name, url = args
+        except ValueError:
+            msg = 'Commmand .add requires exactly 3 arguments: ' \
+                  '<channel_code>, <channel_name>, <url>'
+            raise CommandExecutionError(msg)
+
+        try:
+            validate_url(url)
+        except Exception as error:
+            msg = 'Given URL: %s\n' % url
+            raise CommandExecutionError(msg + error.message)
+
+        channel = {code: {'name': name, 'url': url}}
+        self.data['channels'].update(channel)
+        self.data_file.save(self.data)
+        self.buffer = 'The RSS URL was added in your list.'
+
+
+def get_command_by_input(inp):
+    name = inp[0]
+    arguments = inp[1:]
     for klass in Command.__subclasses__():
         if klass.__dict__['name'] == name:
             return klass(*arguments)

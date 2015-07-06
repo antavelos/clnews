@@ -13,8 +13,8 @@ from colorama import init as colorama_init
 
 from clnews import config
 from clnews.commands import Command
-from clnews.exception import ShellCommandDoesNotExist, \
-ShellCommandChannelNotFound, ShellCommandExecutionError, ShellCommandOutputError
+from clnews.exception import CommandDoesNotExist, \
+CommandChannelNotFound, CommandExecutionError, CommandOutputError
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -49,7 +49,7 @@ class Shell(object):
         try:
             command = self.commands[tokens[0]]
         except KeyError:
-            raise ShellCommandDoesNotExist
+            raise CommandDoesNotExist
 
         return command, tokens[1:]
 
@@ -65,22 +65,23 @@ class Shell(object):
             except (EOFError, KeyboardInterrupt):
                 print
                 break
-            except ShellCommandDoesNotExist, exc:
-                print str(exc), 'Use .help to see the available options'
+            except CommandDoesNotExist, exc:
+                print str(exc), 'Use .help to see the available options.'
                 continue
-            except ShellCommandChannelNotFound:
-                print 'The channel was not found. ' \
-                       'Use .list to see the available ones.'
+            except CommandChannelNotFound, exc:
+                print exc.message + 'Use .list to see the available ones.'
                 continue
 
             try:
                 command.execute(*arguments)
                 command.print_output()
-            except ShellCommandExecutionError:
-                print "An error occured while executing the command."
+            except CommandExecutionError as error:
+                print "An error occured while executing the command.\n" \
+                      + error.message
                 continue
-            except ShellCommandOutputError:
-                print "An error occured while printing the resultof the command"
+            except CommandOutputError as error:
+                print "An error occured while printing output.\n" \
+                      + error.message
                 continue
 
 def main():

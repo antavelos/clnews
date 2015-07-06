@@ -1,7 +1,7 @@
 
 from clnews.exception import EventAttrError, ChannelDataNotFound, ChannelServerError,\
                        ChannelServerError, ChannelRetrieveEventsError, \
-                       ShellCommandDoesNotExist, ShellCommandChannelNotFound
+                       CommandDoesNotExist, CommandChannelNotFound
 
 from clnews.news import Event, Channel
 
