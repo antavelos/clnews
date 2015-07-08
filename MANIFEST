@@ -6,7 +6,7 @@ clnews/__init__.py
 clnews/clnews.py
 clnews/config.py
 clnews/console.py
-clnews/exception.py
+clnews/exceptions.py
 clnews/news.py
 clnews/test/__init__.py
 clnews/test/tests.py

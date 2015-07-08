@@ -3,18 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-CLNews 0.4.0 
+CLNews 0.4.0
 =============
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
-   
+
 shell
 =========================
 .. automodule:: clnews.shell
-   :members: 
+   :members:
 
 
 news
@@ -24,7 +24,7 @@ news
 
 exceptions
 =========================
-.. automodule:: clnews.exception
+.. automodule:: clnews.exceptions
     :members:
 
 Indices and tables

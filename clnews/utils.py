@@ -66,3 +66,16 @@ def validate_url(url):
         raise ValueError(msg)
 
     return True
+
+def get_class_variables(cls):
+    var = vars(cls)
+    return [(key, var.get(key)) for key in var.keys()
+            if not callable(var.get(key)) and
+            not key.startswith('__')]
+
+def get_class_methods(cls):
+    var = vars(cls)
+    return [(key, var.get(key)) for key in var.keys()
+            if callable(var.get(key)) and
+            not key.startswith('__')]
+

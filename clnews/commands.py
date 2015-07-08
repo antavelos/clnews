@@ -12,11 +12,10 @@ from colorama import Fore, Style
 from clnews import config
 from clnews.news import Channel
 from clnews.decorators import less
-from clnews.utils import DataFile, validate_url
-from clnews.exception import  CommandOutputError, ChannelRetrieveEventsError, \
-CommandDoesNotExist, CommandChannelNotFound, CommandExecutionError
-
-
+from clnews.utils import DataFile, validate_url, get_class_variables, \
+get_class_methods
+from clnews.exceptions import  CommandIOError, ChannelRetrieveEventsError, \
+CommandExecutionError
 
 
 class Command(object):
@@ -27,6 +26,7 @@ class Command(object):
     """
     name = None
     description = None
+    options = ''
     data = None
 
     def __init__(self):
@@ -37,11 +37,6 @@ class Command(object):
         self.data_file = DataFile(config.CHANNELS_PATH)
         if not Command.data:
             Command.data = self.data_file.load()
-
-    @classmethod
-    def get_commands_data(cls):
-        return [(cls.__dict__['name'], cls.__dict__['description'])
-                for cls in Command.__subclasses__()]
 
 
     def execute(self, *args):
@@ -68,12 +63,19 @@ class Help(Command):
 
         Puts in the buffer the output of the command
         """
-
+        command_classes = Command.__subclasses__()
         self.buffer = "CLNews %s \n\n" % config.VERSION
         self.buffer += "Options:\n"
 
-        for (name, description) in Command.get_commands_data():
+        for klass in command_classes:
+            name = klass.__dict__.get('name')
+            description = klass.__dict__.get('description')
+            options = klass.__dict__.get('options')
             self.buffer += "\t%10s\t%s\n" % (name, description)
+            if options:
+                self.buffer += "\t%s\toptions: %s\n\n" % (' '*10, options)
+            else:
+                self.buffer += '\n'
         self.buffer += "\n"
 
 
@@ -102,7 +104,7 @@ class List(Command):
         """ Prints the output of the command
 
         Raises:
-            CommandOutputError: An error occured when the buffer is not a
+            CommandIOError: An error occured when the buffer is not a
             list.
         """
         try:
@@ -115,7 +117,7 @@ class List(Command):
             return "\n".join(output)
         except TypeError:
             # the buffer is not a list as expected
-            raise CommandOutputError
+            raise CommandIOError
 
 
 class Get(Command):
@@ -125,7 +127,8 @@ class Get(Command):
     """
 
     name = ".get"
-    description = "retrieves the news of a given channel, e.g.: .get cnn"
+    description = "retrieves the news of a given channel"
+    options = '<channel_code>'
 
     def execute(self, *args):
         """ Executes the command.
@@ -140,11 +143,11 @@ class Get(Command):
             raise CommandExecutionError("You channels' list is empty.")
 
         if len(args) > 1:
-            raise CommandDoesNotExist
+            raise CommandExecutionError('Too few arguments.')
 
         channel_code = args[0]
         if channel_code not in self.data['channels'].keys():
-            raise CommandChannelNotFound
+            raise CommandExecutionError("Channel not found.")
 
         name = self.data['channels'][channel_code]['name']
         url = self.data['channels'][channel_code]['url']
@@ -154,14 +157,14 @@ class Get(Command):
         try:
             self.buffer = channel.get_events()
         except ChannelRetrieveEventsError:
-            raise CommandOutputError
+            raise CommandExecutionError("Error while retrieving data.")
 
     @less
     def print_output(self):
         """ Prints the output of the command
 
         Raises:
-            CommandOutputError: An error occured when the buffer is not a
+            CommandIOError: An error occured when the buffer is not a
             list.
         """
         try:
@@ -178,7 +181,7 @@ class Get(Command):
 
         except TypeError:
             # the buffer is not a list as expected
-            raise CommandOutputError
+            raise CommandIOError
 
 
 class Quit(Command):
@@ -200,7 +203,7 @@ class Add(Command):
 
     name = ".add"
     description = "adds a new channel."
-
+    options = '<channel_code> <channel_name> <url>'
 
     def execute(self, *args):
         try:
@@ -217,7 +220,10 @@ class Add(Command):
             raise CommandExecutionError(msg + error.message)
 
         channel = {code: {'name': name, 'url': url}}
-        self.data['channels'].update(channel)
+        if 'channels' in self.data:
+            self.data['channels'].update(channel)
+        else:
+            self.data['channels'] = channel
         self.data_file.save(self.data)
         self.buffer = 'The RSS URL was added in your list.'
 

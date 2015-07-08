@@ -13,8 +13,7 @@ from colorama import init as colorama_init
 
 from clnews import config
 from clnews.commands import Command
-from clnews.exception import CommandDoesNotExist, \
-CommandChannelNotFound, CommandExecutionError, CommandOutputError
+from clnews.exceptions import CommandExecutionError, CommandIOError
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -49,7 +48,7 @@ class Shell(object):
         try:
             command = self.commands[tokens[0]]
         except KeyError:
-            raise CommandDoesNotExist
+            raise CommandExecutionError('Command not found.\n')
 
         return command, tokens[1:]
 
@@ -65,7 +64,7 @@ class Shell(object):
             except (EOFError, KeyboardInterrupt):
                 print
                 break
-            except CommandDoesNotExist, exc:
+            except CommandExecutionError, exc:
                 print str(exc), 'Use .help to see the available options.'
                 continue
             except CommandChannelNotFound, exc:
@@ -79,7 +78,7 @@ class Shell(object):
                 print "An error occured while executing the command.\n" \
                       + error.message
                 continue
-            except CommandOutputError as error:
+            except CommandIOError as error:
                 print "An error occured while printing output.\n" \
                       + error.message
                 continue

@@ -1,5 +1,5 @@
 """
-.. module:: exception
+.. module:: exceptions
    :platform: Unix
       :synopsis: This module contains the exceptions of the modules.
 
@@ -22,7 +22,7 @@ class ChannelServerError(Exception):
     """ Is raised when feedparser returns a server error."""
 
 class ChannelRetrieveEventsError(Exception):
-    """ Is raised when an uncaught exception occurs during events' retrieval."""
+    """ Is raised when an uncaught exceptions occurs during events' retrieval."""
 
 
 # Shell Exceptions
@@ -32,16 +32,12 @@ class ShellLoadDataIOError(Exception):
 class ShellLoadDataCorruptedFile(Exception):
     """ Is raised when the data file is corrupted"""
 
-class CommandDoesNotExist(Exception):
-    """ Is raised when an unknown command is given in input prompt."""
 
-class CommandChannelNotFound(Exception):
-    """ Is raised when events from an unknown channel are requested."""
-
+# Command Exceptions
 class CommandExecutionError(Exception):
     """ IS raised when an error occurs while executing a command."""
 
-class CommandOutputError(Exception):
+class CommandIOError(Exception):
     """ Is raised when output is not of the expected type."""
 
 
