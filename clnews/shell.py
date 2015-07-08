@@ -67,7 +67,7 @@ class Shell(object):
             except CommandExecutionError, exc:
                 print str(exc), 'Use .help to see the available options.'
                 continue
-            except CommandChannelNotFound, exc:
+            except CommandExecutionError, exc:
                 print exc.message + 'Use .list to see the available ones.'
                 continue
 
@@ -75,8 +75,7 @@ class Shell(object):
                 command.execute(*arguments)
                 command.print_output()
             except CommandExecutionError as error:
-                print "An error occured while executing the command.\n" \
-                      + error.message
+                print "Command error:\t%s" % error.message
                 continue
             except CommandIOError as error:
                 print "An error occured while printing output.\n" \

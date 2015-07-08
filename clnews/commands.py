@@ -12,8 +12,7 @@ from colorama import Fore, Style
 from clnews import config
 from clnews.news import Channel
 from clnews.decorators import less
-from clnews.utils import DataFile, validate_url, get_class_variables, \
-get_class_methods
+from clnews.utils import DataFile, validate_url
 from clnews.exceptions import  CommandIOError, ChannelRetrieveEventsError, \
 CommandExecutionError
 
@@ -128,7 +127,7 @@ class Get(Command):
 
     name = ".get"
     description = "retrieves the news of a given channel"
-    options = '<channel_code>'
+    options = '[channel_code]'
 
     def execute(self, *args):
         """ Executes the command.
@@ -142,8 +141,8 @@ class Get(Command):
         if not self.data:
             raise CommandExecutionError("You channels' list is empty.")
 
-        if len(args) > 1:
-            raise CommandExecutionError('Too few arguments.')
+        if len(args) != 1:
+            raise CommandExecutionError('Check the provided arguments.')
 
         channel_code = args[0]
         if channel_code not in self.data['channels'].keys():
@@ -187,7 +186,7 @@ class Get(Command):
 class Quit(Command):
     """ Implements the .get command.
 
-    Derives from :class:`shell.Command` class and implements the .get command
+    Derives from :class:`shell.Command` class and implements the .quit command
     """
 
     name = ".quit"
@@ -198,19 +197,19 @@ class Quit(Command):
 class Add(Command):
     """ Implements the .add command.
 
-    Derives from :class:`shell.Command` class and implements the .get command
+    Derives from :class:`shell.Command` class and implements the .add command
     """
 
     name = ".add"
     description = "adds a new channel."
-    options = '<channel_code> <channel_name> <url>'
+    options = '[channel_code] [channel_name] [url]'
 
     def execute(self, *args):
         try:
             code, name, url = args
         except ValueError:
             msg = 'Commmand .add requires exactly 3 arguments: ' \
-                  '<channel_code>, <channel_name>, <url>'
+                  '[channel_code], [channel_name], [url]'
             raise CommandExecutionError(msg)
 
         try:
@@ -227,6 +226,31 @@ class Add(Command):
         self.data_file.save(self.data)
         self.buffer = 'The RSS URL was added in your list.'
 
+
+class Remove(Command):
+    """ Implements the .remove command.
+
+    Derives from :class:`shell.Command` class and implements the .remove command
+    """
+
+    name = ".remove"
+    description = "adds one or more channels from the list."
+    options = '[channel_code]...'
+
+    def execute(self, *args):
+
+        if not args:
+            raise CommandExecutionError('No channel code was provided.')
+
+        channel_codes = self.data['channels'].keys()
+        for arg in args:
+            if arg in channel_codes:
+                del self.data['channels'][arg]
+            else:
+                msg = 'Channel %s was not found in your list' % arg
+                raise CommandExecutionError(msg)
+        self.data_file.save(self.data)
+        self.buffer = 'The channel(s) were removed from your list.'
 
 def get_command_by_input(inp):
     name = inp[0]
