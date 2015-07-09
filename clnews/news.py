@@ -9,7 +9,7 @@
 import feedparser
 
 from clnews.utils import remove_html
-from clnews.exception import ChannelDataNotFound, ChannelServerError, \
+from clnews.exceptions import ChannelDataNotFound, ChannelServerError, \
 ChannelRetrieveEventsError
 
 class Event(object):

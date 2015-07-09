@@ -53,7 +53,7 @@ class Command(object):
 
     @classmethod
     def url_exists(cls, url):
-        return url in [val['url'] for val in Command.data['channels'].values()]
+        return url in [val['url'] for val in cls.data['channels'].values()]
 
 class Help(Command):
     """ Implements the .help command.
@@ -227,11 +227,8 @@ class Add(Command):
             msg = 'This URL already exists in your list.'
             raise CommandExecutionError(msg)
 
-        try:
-            validate_url(url)
-        except Exception as error:
-            msg = 'Given URL: %s\n' % url
-            raise CommandExecutionError(msg + error.message)
+        if not validate_url(url):
+            raise CommandExecutionError('URL is either not valid or broken')
 
         channel = {code: {'name': name, 'url': url}}
         if 'channels' in Command.data:

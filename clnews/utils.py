@@ -46,7 +46,6 @@ class DataFile(object):
             pickle.dump(data, f)
 
 
-
 def remove_html(string):
     p = re.compile(r'<.*?>')
     string = p.sub('', string)
@@ -54,28 +53,12 @@ def remove_html(string):
     return string
 
 def validate_url(url):
-    parse_result = urlparse.urlparse(url)
-    if parse_result.scheme != 'http':
-        msg = 'Please provide the full version of the URL i.e.' \
-              'http://www.getmyfeed.com'
-        raise ValueError(msg)
+    parse_url = urlparse.urlparse(url)
+    if parse_url.scheme != 'http':
+        return False
 
     result = urllib.urlopen(url)
     if result.code != 200:
-        msg = 'The URL you provided appears to be broken'
-        raise ValueError(msg)
+        return False
 
     return True
-
-def get_class_variables(cls):
-    var = vars(cls)
-    return [(key, var.get(key)) for key in var.keys()
-            if not callable(var.get(key)) and
-            not key.startswith('__')]
-
-def get_class_methods(cls):
-    var = vars(cls)
-    return [(key, var.get(key)) for key in var.keys()
-            if callable(var.get(key)) and
-            not key.startswith('__')]
-
