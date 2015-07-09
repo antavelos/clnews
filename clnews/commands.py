@@ -47,6 +47,13 @@ class Command(object):
         """ Prints the output of the command"""
         print self.buffer
 
+    @classmethod
+    def code_exists(cls, code):
+        return code in cls.data['channels']
+
+    @classmethod
+    def url_exists(cls, url):
+        return url in [val['url'] for val in Command.data['channels'].values()]
 
 class Help(Command):
     """ Implements the .help command.
@@ -93,10 +100,10 @@ class List(Command):
         Lists all the available channels.
         '''
         self.buffer = ''
-        if self.data:
+        if Command.data:
             self.buffer = [(key, data["name"])
                            for key, data
-                           in self.data["channels"].iteritems()]
+                           in Command.data["channels"].iteritems()]
 
     @less
     def print_output(self):
@@ -135,21 +142,20 @@ class Get(Command):
         Retrieves the events for the given channel.
 
         Raises:
-            CommandExecutionError: An error occured when the event
-            retrieval fails.
+            CommandExecutionError
         """
-        if not self.data:
+        if not Command.data:
             raise CommandExecutionError("You channels' list is empty.")
 
         if len(args) != 1:
             raise CommandExecutionError('Check the provided arguments.')
 
         channel_code = args[0]
-        if channel_code not in self.data['channels'].keys():
+        if channel_code not in Command.data['channels'].keys():
             raise CommandExecutionError("Channel not found.")
 
-        name = self.data['channels'][channel_code]['name']
-        url = self.data['channels'][channel_code]['url']
+        name = Command.data['channels'][channel_code]['name']
+        url = Command.data['channels'][channel_code]['url']
 
         channel = Channel(name, url)
 
@@ -204,12 +210,21 @@ class Add(Command):
     description = "adds a new channel."
     options = '[channel_code] [channel_name] [url]'
 
+
     def execute(self, *args):
         try:
             code, name, url = args
         except ValueError:
             msg = 'Commmand .add requires exactly 3 arguments: ' \
                   '[channel_code], [channel_name], [url]'
+            raise CommandExecutionError(msg)
+
+        if Command.code_exists(code):
+            msg = 'This code already exists in your list.'
+            raise CommandExecutionError(msg)
+
+        if Command.url_exists(url):
+            msg = 'This URL already exists in your list.'
             raise CommandExecutionError(msg)
 
         try:
@@ -219,11 +234,11 @@ class Add(Command):
             raise CommandExecutionError(msg + error.message)
 
         channel = {code: {'name': name, 'url': url}}
-        if 'channels' in self.data:
-            self.data['channels'].update(channel)
+        if 'channels' in Command.data:
+            Command.data['channels'].update(channel)
         else:
-            self.data['channels'] = channel
-        self.data_file.save(self.data)
+            Command.data['channels'] = channel
+        self.data_file.save(Command.data)
         self.buffer = 'The RSS URL was added in your list.'
 
 
@@ -242,21 +257,21 @@ class Remove(Command):
         if not args:
             raise CommandExecutionError('No channel code was provided.')
 
-        channel_codes = self.data['channels'].keys()
+        # remove all
+        if len(args) == 1 and args[0] == '*':
+            Command.data = {}
+            self.data_file.save(Command.data)
+            self.buffer = 'All the channels were removed from your list.'
+            return
+
+        data_copy = dict(Command.data)
+        channel_codes = data_copy['channels'].keys()
         for arg in args:
             if arg in channel_codes:
-                del self.data['channels'][arg]
+                del data_copy['channels'][arg]
             else:
                 msg = 'Channel %s was not found in your list' % arg
                 raise CommandExecutionError(msg)
-        self.data_file.save(self.data)
+        self.data_file.save(data_copy)
         self.buffer = 'The channel(s) were removed from your list.'
 
-def get_command_by_input(inp):
-    name = inp[0]
-    arguments = inp[1:]
-    for klass in Command.__subclasses__():
-        if klass.__dict__['name'] == name:
-            return klass(*arguments)
-
-    return None

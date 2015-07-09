@@ -48,7 +48,7 @@ class Shell(object):
         try:
             command = self.commands[tokens[0]]
         except KeyError:
-            raise CommandExecutionError('Command not found.\n')
+            raise CommandIOError('Command not found.\n')
 
         return command, tokens[1:]
 
@@ -64,11 +64,8 @@ class Shell(object):
             except (EOFError, KeyboardInterrupt):
                 print
                 break
-            except CommandExecutionError, exc:
-                print str(exc), 'Use .help to see the available options.'
-                continue
-            except CommandExecutionError, exc:
-                print exc.message + 'Use .list to see the available ones.'
+            except CommandIOError, error:
+                print error.message, 'Use .help to see the available options.'
                 continue
 
             try:
