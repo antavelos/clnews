@@ -26,7 +26,7 @@ class Command(object):
     name = None
     description = None
     options = ''
-    data = None
+    data = {'channels': {}}
 
     def __init__(self):
         """Initializes of the command."""
@@ -173,14 +173,14 @@ class Get(Command):
             list.
         """
         try:
-            output = ["%3s. %s, %s\n     %s\n     %s\n" % \
+            output = ["%3s. %s, %s\n     %s\n     %s\n" %
                       (Fore.WHITE + Style.BRIGHT + str(i + 1), event.title,
                        Fore.MAGENTA + event.date,
                        Fore.WHITE + Style.DIM + event.url,
                        Fore.YELLOW + Style.NORMAL + event.summary)
                       for i, event
                       in enumerate(self.buffer)
-                     ]
+                      ]
 
             return "\n".join(output)
 
@@ -199,7 +199,6 @@ class Quit(Command):
     description = "exits the application."
 
 
-
 class Add(Command):
     """ Implements the .add command.
 
@@ -209,7 +208,6 @@ class Add(Command):
     name = ".add"
     description = "adds a new channel."
     options = '[channel_code] [channel_name] [url]'
-
 
     def execute(self, *args):
         try:
@@ -271,4 +269,3 @@ class Remove(Command):
                 raise CommandExecutionError(msg)
         self.data_file.save(data_copy)
         self.buffer = 'The channel(s) were removed from your list.'
-

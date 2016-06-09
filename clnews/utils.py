@@ -12,8 +12,10 @@ import urlparse
 import urllib
 import pickle
 
+
 class DataFileMeta(type):
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(DataFileMeta, cls).__call__(*args,
@@ -40,7 +42,6 @@ class DataFile(object):
             except EOFError:
                 return {}
 
-
     def save(self, data):
         with open(self.filename, 'wb') as f:
             pickle.dump(data, f)
@@ -51,6 +52,7 @@ def remove_html(string):
     string = p.sub('', string)
 
     return string
+
 
 def validate_url(url):
     parse_url = urlparse.urlparse(url)
